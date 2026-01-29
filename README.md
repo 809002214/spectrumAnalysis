@@ -13,14 +13,23 @@ Real-time audio spectrum and spectrogram visualization library + example applica
 
 ```
 spectrumAnalysis/
-├── AudioSpectrumVisualizer/     # 可复用的可视化控件库
-│   ├── Controls/                # SpectrumControl, SpectrogramControl
-│   ├── DSP/                     # FFTProcessor
-│   └── README.md                # 完整的API文档
+├── AudioSpectrumVisualizer/          # 可复用的可视化控件库
+│   ├── Controls/
+│   │   ├── SpectrumControl.cs       # 频谱图控件（柱状图/曲线/填充）
+│   │   └── SpectrogramControl.cs    # 声谱图控件（瀑布式热力图）
+│   ├── DSP/
+│   │   └── FFTProcessor.cs          # FFT处理器（Cooley-Tukey算法）
+│   ├── Theme/
+│   │   └── ColorTheme.cs            # 主题系统（深色/浅色主题）
+│   ├── README.md                    # 完整的API文档
+│   └── LICENSE                      # MIT许可证
 │
-└── SpectrumAnalysis/            # 示例应用程序
-    ├── Audio/                   # 音频采集
-    └── MainForm.cs              # 主窗体
+└── SpectrumAnalysis/                # 示例应用程序
+    ├── Audio/
+    │   └── AudioCapture.cs          # 麦克风音频采集
+    ├── MainForm.cs                  # 主窗体
+    ├── MainForm.Designer.cs         # 设计器文件
+    └── Program.cs                   # 程序入口
 ```
 
 ---

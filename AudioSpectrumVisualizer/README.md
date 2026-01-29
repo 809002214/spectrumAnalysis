@@ -294,10 +294,19 @@ Created for real-time audio visualization applications.
 
 ## Changelog | 更新日志
 
-### Version 1.0.0
+### Version 1.0.0 (2026-01-29)
 - Initial release
-- SpectrumControl with multiple display modes
+- SpectrumControl with multiple display modes (Bars, Line, FilledLine)
 - SpectrogramControl with waterfall display
 - FFTProcessor with Cooley-Tukey algorithm
+- ColorTheme system for dark/light themes
 - Full API documentation
 - Chinese and English comments
+- Thread-safe data updates
+- Interactive features (zoom, pan, hover tooltips)
+- Peak detection and labeling
+- Frequency range synchronization
+
+---
+
+**最后更新：** 2026-01-29

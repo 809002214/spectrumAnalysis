@@ -51,6 +51,9 @@ namespace SpectrumAnalysis
             InitializeCustomTitleBar();
             InitializeAudioCapture();
 
+            // 设置任务栏图标
+            InitializeIcon();
+
             // 加载配置
             LoadSettings();
 
@@ -189,6 +192,9 @@ namespace SpectrumAnalysis
             // 设置刷新速度（默认每N次FFT更新一次，约10帧/秒）
             _audioCapture.UpdateInterval = UPDATE_INTERVAL;
 
+            // 设置初始增益为 1.0x
+            _audioCapture.Gain = 1.0f;
+
             // 设置频谱控件的采样率
             _spectrumControl.SampleRate = SAMPLE_RATE;
 
@@ -204,6 +210,55 @@ namespace SpectrumAnalysis
 
             // 订阅频谱控件的频率范围变化事件，同步到声谱图
             _spectrumControl.FrequencyRangeChanged += SpectrumControl_FrequencyRangeChanged;
+        }
+
+        /// <summary>
+        /// 初始化任务栏图标
+        /// </summary>
+        private void InitializeIcon()
+        {
+            try
+            {
+                // 创建一个 32x32 的位图作为图标
+                using (Bitmap bmp = new Bitmap(32, 32))
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    // 设置高质量渲染
+                    g.SmoothingMode = SmoothingMode.AntiAlias;
+
+                    // 绘制深色背景
+                    using (SolidBrush bgBrush = new SolidBrush(Color.FromArgb(30, 30, 30)))
+                    {
+                        g.FillRectangle(bgBrush, 0, 0, 32, 32);
+                    }
+
+                    // 绘制频谱柱状图（模拟音频频谱）
+                    int barCount = 8;
+                    int barWidth = 3;
+                    int spacing = 1;
+                    int[] heights = { 8, 14, 20, 24, 22, 16, 10, 6 }; // 模拟频谱高度
+
+                    using (SolidBrush barBrush = new SolidBrush(Color.FromArgb(0, 200, 255))) // 青色
+                    {
+                        for (int i = 0; i < barCount; i++)
+                        {
+                            int x = 2 + i * (barWidth + spacing);
+                            int height = heights[i];
+                            int y = 28 - height;
+                            g.FillRectangle(barBrush, x, y, barWidth, height);
+                        }
+                    }
+
+                    // 转换为图标
+                    IntPtr hIcon = bmp.GetHicon();
+                    this.Icon = Icon.FromHandle(hIcon);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 如果创建图标失败，使用默认图标
+                System.Diagnostics.Debug.WriteLine($"创建图标失败: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -226,6 +281,9 @@ namespace SpectrumAnalysis
                 _audioCapture.Start();
                 _startButton.Enabled = false;
                 _stopButton.Enabled = true;
+
+                // 采集时禁用 IQ 模式切换
+                _iqModeCheckBox.Enabled = false;
             }
             catch (Exception ex)
             {
@@ -242,6 +300,9 @@ namespace SpectrumAnalysis
             _audioCapture.Stop();
             _startButton.Enabled = true;
             _stopButton.Enabled = false;
+
+            // 停止后允许切换 IQ 模式
+            _iqModeCheckBox.Enabled = true;
         }
 
         /// <summary>
@@ -349,6 +410,47 @@ namespace SpectrumAnalysis
         }
 
         /// <summary>
+        /// IQ模式复选框状态改变事件
+        /// </summary>
+        private void IQModeCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            bool isIQMode = _iqModeCheckBox.Checked;
+
+            // 设置IQ模式（不自动重启采集）
+            if (_audioCapture != null)
+            {
+                _audioCapture.IsIQMode = isIQMode;
+            }
+
+            // 更新控件的IQ模式
+            _spectrumControl.IsIQMode = isIQMode;
+            _spectrogramControl.IsIQMode = isIQMode;
+
+            // 更新采样率（触发频率范围更新）
+            _spectrumControl.SampleRate = SAMPLE_RATE;
+            _spectrogramControl.SampleRate = SAMPLE_RATE;
+
+            // 显示提示信息
+            if (isIQMode)
+            {
+                MessageBox.Show(
+                    "IQ模式已启用！\n\n" +
+                    "左声道 = I（实部）\n" +
+                    "右声道 = Q（虚部）\n\n" +
+                    "频率范围：-24kHz 到 +24kHz\n\n" +
+                    "⚠️ 注意：切换 IQ 模式后需要手动停止并重新启动采集才能生效\n\n" +
+                    "提示：\n" +
+                    "• 可以随时调整幅度范围（dB）来查看微弱信号\n" +
+                    "• 普通麦克风会显示对称频谱（镜像）\n" +
+                    "• 此模式适用于 SoftRock 等硬件 IQ 混频器",
+                    "IQ模式",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
+        }
+
+        /// <summary>
         /// 应用幅度范围按钮点击事件
         /// </summary>
         private void ApplyAmplitudeButton_Click(object sender, EventArgs e)
@@ -372,6 +474,38 @@ namespace SpectrumAnalysis
             // 应用到声谱图控件
             _spectrogramControl.MinDb = minDb;
             _spectrogramControl.MaxDb = maxDb;
+        }
+
+        /// <summary>
+        /// 增益滑块滚动事件
+        /// </summary>
+        private void GainTrackBar_Scroll(object sender, EventArgs e)
+        {
+            // 将滑块值转换为增益（dB 刻度：-20dB 到 +20dB）
+            // 滑块范围：0-40
+            // 0: -20dB (0.1x)
+            // 20: 0dB (1.0x) - 中间位置
+            // 40: +20dB (10.0x)
+
+            int value = _gainTrackBar.Value;
+            float gainDb = (value - 20) * 1.0f;  // -20dB 到 +20dB
+            float gain = (float)Math.Pow(10, gainDb / 20.0);  // dB 转线性
+
+            // 应用增益
+            if (_audioCapture != null)
+            {
+                _audioCapture.Gain = gain;
+            }
+
+            // 更新显示标签
+            if (gainDb >= 0)
+            {
+                _gainValueLabel.Text = $"+{gainDb:F0}dB";
+            }
+            else
+            {
+                _gainValueLabel.Text = $"{gainDb:F0}dB";
+            }
         }
 
         /// <summary>
@@ -512,10 +646,33 @@ namespace SpectrumAnalysis
 
                 this.WindowState = Properties.Settings.Default.WindowState;
 
-                // 加载显示选项
+                // 加载显示选项（暂时禁用事件以避免触发自动启动）
+                _showGridCheckBox.CheckedChanged -= ShowGridCheckBox_CheckedChanged;
+                _showAxisCheckBox.CheckedChanged -= ShowAxisCheckBox_CheckedChanged;
+                _showPeaksCheckBox.CheckedChanged -= ShowPeaksCheckBox_CheckedChanged;
+                _iqModeCheckBox.CheckedChanged -= IQModeCheckBox_CheckedChanged;
+
                 _showGridCheckBox.Checked = Properties.Settings.Default.ShowGrid;
                 _showAxisCheckBox.Checked = Properties.Settings.Default.ShowAxis;
                 _showPeaksCheckBox.Checked = Properties.Settings.Default.ShowPeaks;
+                _iqModeCheckBox.Checked = Properties.Settings.Default.IsIQMode;
+
+                // 重新启用事件
+                _showGridCheckBox.CheckedChanged += ShowGridCheckBox_CheckedChanged;
+                _showAxisCheckBox.CheckedChanged += ShowAxisCheckBox_CheckedChanged;
+                _showPeaksCheckBox.CheckedChanged += ShowPeaksCheckBox_CheckedChanged;
+                _iqModeCheckBox.CheckedChanged += IQModeCheckBox_CheckedChanged;
+
+                // 手动应用 IQ 模式设置（不触发事件）
+                if (Properties.Settings.Default.IsIQMode)
+                {
+                    if (_audioCapture != null)
+                    {
+                        _audioCapture.IsIQMode = true;
+                    }
+                    _spectrumControl.IsIQMode = true;
+                    _spectrogramControl.IsIQMode = true;
+                }
 
                 // 加载显示模式
                 string displayMode = Properties.Settings.Default.DisplayMode;
@@ -564,6 +721,7 @@ namespace SpectrumAnalysis
                 Properties.Settings.Default.ShowGrid = _showGridCheckBox.Checked;
                 Properties.Settings.Default.ShowAxis = _showAxisCheckBox.Checked;
                 Properties.Settings.Default.ShowPeaks = _showPeaksCheckBox.Checked;
+                Properties.Settings.Default.IsIQMode = _iqModeCheckBox.Checked;
 
                 // 保存显示模式
                 Properties.Settings.Default.DisplayMode = _spectrumControl.DisplayMode.ToString();

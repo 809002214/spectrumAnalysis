@@ -1,8 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SpectrumAnalysis.Properties" GeneratedClassName="Settings">
+  <Profiles />
   <Settings>
     <Setting Name="ThemeName" Type="System.String" Scope="User">
       <Value Profile="(Default)">Dark</Value>
@@ -23,6 +21,9 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="ShowPeaks" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="IsIQMode" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="DisplayMode" Type="System.String" Scope="User">

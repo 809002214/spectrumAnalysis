@@ -28,7 +28,11 @@ namespace SpectrumAnalysis
         private System.Windows.Forms.CheckBox _showGridCheckBox;
         private System.Windows.Forms.CheckBox _showAxisCheckBox;
         private System.Windows.Forms.CheckBox _showPeaksCheckBox;
+        private System.Windows.Forms.CheckBox _iqModeCheckBox;
         private System.Windows.Forms.Label _displayOptionsLabel;
+        private System.Windows.Forms.Label _gainLabel;
+        private System.Windows.Forms.TrackBar _gainTrackBar;
+        private System.Windows.Forms.Label _gainValueLabel;
         private System.Windows.Forms.Panel _separator1;
         private System.Windows.Forms.Panel _separator2;
         private System.Windows.Forms.Label _amplitudeRangeLabel;
@@ -84,6 +88,10 @@ namespace SpectrumAnalysis
             this._showGridCheckBox = new System.Windows.Forms.CheckBox();
             this._showAxisCheckBox = new System.Windows.Forms.CheckBox();
             this._showPeaksCheckBox = new System.Windows.Forms.CheckBox();
+            this._iqModeCheckBox = new System.Windows.Forms.CheckBox();
+            this._gainLabel = new System.Windows.Forms.Label();
+            this._gainTrackBar = new System.Windows.Forms.TrackBar();
+            this._gainValueLabel = new System.Windows.Forms.Label();
             this._amplitudeRangeLabel = new System.Windows.Forms.Label();
             this._minDbNumeric = new System.Windows.Forms.NumericUpDown();
             this._dbRangeSeparatorLabel = new System.Windows.Forms.Label();
@@ -94,6 +102,7 @@ namespace SpectrumAnalysis
             this._spectrogramControl = new AudioSpectrumVisualizer.Controls.SpectrogramControl();
             this._titleBarPanel.SuspendLayout();
             this._controlPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._gainTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._minDbNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._maxDbNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._splitContainer)).BeginInit();
@@ -207,6 +216,10 @@ namespace SpectrumAnalysis
             this._controlPanel.Controls.Add(this._showGridCheckBox);
             this._controlPanel.Controls.Add(this._showAxisCheckBox);
             this._controlPanel.Controls.Add(this._showPeaksCheckBox);
+            this._controlPanel.Controls.Add(this._iqModeCheckBox);
+            this._controlPanel.Controls.Add(this._gainLabel);
+            this._controlPanel.Controls.Add(this._gainTrackBar);
+            this._controlPanel.Controls.Add(this._gainValueLabel);
             this._controlPanel.Controls.Add(this._amplitudeRangeLabel);
             this._controlPanel.Controls.Add(this._minDbNumeric);
             this._controlPanel.Controls.Add(this._dbRangeSeparatorLabel);
@@ -458,14 +471,66 @@ namespace SpectrumAnalysis
             this._showPeaksCheckBox.UseVisualStyleBackColor = false;
             this._showPeaksCheckBox.CheckedChanged += new System.EventHandler(this.ShowPeaksCheckBox_CheckedChanged);
             //
+            // _iqModeCheckBox
+            //
+            this._iqModeCheckBox.Appearance = System.Windows.Forms.Appearance.Button;
+            this._iqModeCheckBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this._iqModeCheckBox.FlatAppearance.BorderSize = 0;
+            this._iqModeCheckBox.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(100)))));
+            this._iqModeCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._iqModeCheckBox.Font = new System.Drawing.Font("微软雅黑", 8.5F);
+            this._iqModeCheckBox.ForeColor = System.Drawing.Color.White;
+            this._iqModeCheckBox.Location = new System.Drawing.Point(390, 53);
+            this._iqModeCheckBox.Name = "_iqModeCheckBox";
+            this._iqModeCheckBox.Size = new System.Drawing.Size(110, 26);
+            this._iqModeCheckBox.TabIndex = 16;
+            this._iqModeCheckBox.Text = "📡 IQ模式";
+            this._iqModeCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this._iqModeCheckBox.UseVisualStyleBackColor = false;
+            this._iqModeCheckBox.CheckedChanged += new System.EventHandler(this.IQModeCheckBox_CheckedChanged);
+            //
+            // _gainLabel
+            //
+            this._gainLabel.Font = new System.Drawing.Font("微软雅黑", 8.5F);
+            this._gainLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this._gainLabel.Location = new System.Drawing.Point(870, 53);
+            this._gainLabel.Name = "_gainLabel";
+            this._gainLabel.Size = new System.Drawing.Size(50, 26);
+            this._gainLabel.TabIndex = 22;
+            this._gainLabel.Text = "增益:";
+            this._gainLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            //
+            // _gainTrackBar
+            //
+            this._gainTrackBar.Location = new System.Drawing.Point(920, 53);
+            this._gainTrackBar.Maximum = 40;
+            this._gainTrackBar.Minimum = 0;
+            this._gainTrackBar.Name = "_gainTrackBar";
+            this._gainTrackBar.Size = new System.Drawing.Size(150, 45);
+            this._gainTrackBar.TabIndex = 23;
+            this._gainTrackBar.TickFrequency = 5;
+            this._gainTrackBar.Value = 20;
+            this._gainTrackBar.Scroll += new System.EventHandler(this.GainTrackBar_Scroll);
+            //
+            // _gainValueLabel
+            //
+            this._gainValueLabel.Font = new System.Drawing.Font("微软雅黑", 8.5F, System.Drawing.FontStyle.Bold);
+            this._gainValueLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(150)))), ((int)(((byte)(255)))));
+            this._gainValueLabel.Location = new System.Drawing.Point(1075, 53);
+            this._gainValueLabel.Name = "_gainValueLabel";
+            this._gainValueLabel.Size = new System.Drawing.Size(50, 26);
+            this._gainValueLabel.TabIndex = 24;
+            this._gainValueLabel.Text = "0dB";
+            this._gainValueLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            //
             // _amplitudeRangeLabel
             //
             this._amplitudeRangeLabel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold);
             this._amplitudeRangeLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
-            this._amplitudeRangeLabel.Location = new System.Drawing.Point(400, 53);
+            this._amplitudeRangeLabel.Location = new System.Drawing.Point(520, 53);
             this._amplitudeRangeLabel.Name = "_amplitudeRangeLabel";
             this._amplitudeRangeLabel.Size = new System.Drawing.Size(100, 26);
-            this._amplitudeRangeLabel.TabIndex = 16;
+            this._amplitudeRangeLabel.TabIndex = 17;
             this._amplitudeRangeLabel.Text = "幅度范围 (dB)";
             this._amplitudeRangeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             //
@@ -475,22 +540,22 @@ namespace SpectrumAnalysis
             this._minDbNumeric.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this._minDbNumeric.Font = new System.Drawing.Font("微软雅黑", 9F);
             this._minDbNumeric.ForeColor = System.Drawing.Color.White;
-            this._minDbNumeric.Location = new System.Drawing.Point(510, 53);
+            this._minDbNumeric.Location = new System.Drawing.Point(630, 53);
             this._minDbNumeric.Maximum = new decimal(new int[] { 0, 0, 0, 0 });
             this._minDbNumeric.Minimum = new decimal(new int[] { 120, 0, 0, -2147483648 });
             this._minDbNumeric.Name = "_minDbNumeric";
             this._minDbNumeric.Size = new System.Drawing.Size(60, 23);
-            this._minDbNumeric.TabIndex = 17;
+            this._minDbNumeric.TabIndex = 18;
             this._minDbNumeric.Value = new decimal(new int[] { 80, 0, 0, -2147483648 });
             //
             // _dbRangeSeparatorLabel
             //
             this._dbRangeSeparatorLabel.Font = new System.Drawing.Font("微软雅黑", 9F);
             this._dbRangeSeparatorLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
-            this._dbRangeSeparatorLabel.Location = new System.Drawing.Point(575, 53);
+            this._dbRangeSeparatorLabel.Location = new System.Drawing.Point(695, 53);
             this._dbRangeSeparatorLabel.Name = "_dbRangeSeparatorLabel";
             this._dbRangeSeparatorLabel.Size = new System.Drawing.Size(20, 26);
-            this._dbRangeSeparatorLabel.TabIndex = 18;
+            this._dbRangeSeparatorLabel.TabIndex = 19;
             this._dbRangeSeparatorLabel.Text = "~";
             this._dbRangeSeparatorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             //
@@ -500,12 +565,12 @@ namespace SpectrumAnalysis
             this._maxDbNumeric.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this._maxDbNumeric.Font = new System.Drawing.Font("微软雅黑", 9F);
             this._maxDbNumeric.ForeColor = System.Drawing.Color.White;
-            this._maxDbNumeric.Location = new System.Drawing.Point(600, 53);
+            this._maxDbNumeric.Location = new System.Drawing.Point(720, 53);
             this._maxDbNumeric.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
             this._maxDbNumeric.Minimum = new decimal(new int[] { 60, 0, 0, -2147483648 });
             this._maxDbNumeric.Name = "_maxDbNumeric";
             this._maxDbNumeric.Size = new System.Drawing.Size(60, 23);
-            this._maxDbNumeric.TabIndex = 19;
+            this._maxDbNumeric.TabIndex = 20;
             this._maxDbNumeric.Value = new decimal(new int[] { 0, 0, 0, 0 });
             //
             // _applyAmplitudeButton
@@ -515,10 +580,10 @@ namespace SpectrumAnalysis
             this._applyAmplitudeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this._applyAmplitudeButton.Font = new System.Drawing.Font("微软雅黑", 8.5F);
             this._applyAmplitudeButton.ForeColor = System.Drawing.Color.White;
-            this._applyAmplitudeButton.Location = new System.Drawing.Point(670, 53);
+            this._applyAmplitudeButton.Location = new System.Drawing.Point(790, 53);
             this._applyAmplitudeButton.Name = "_applyAmplitudeButton";
             this._applyAmplitudeButton.Size = new System.Drawing.Size(60, 26);
-            this._applyAmplitudeButton.TabIndex = 20;
+            this._applyAmplitudeButton.TabIndex = 21;
             this._applyAmplitudeButton.Text = "应用";
             this._applyAmplitudeButton.UseVisualStyleBackColor = false;
             this._applyAmplitudeButton.Click += new System.EventHandler(this.ApplyAmplitudeButton_Click);

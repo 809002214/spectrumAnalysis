@@ -93,9 +93,25 @@ namespace AudioSpectrumVisualizer.Controls
             set
             {
                 _sampleRate = value;
-                _maxFrequency = value / 2f;  // 奈奎斯特频率
+                // 根据IQ模式设置频率范围
+                if (IsIQMode)
+                {
+                    _minFrequency = -value / 2f;  // 负频率
+                    _maxFrequency = value / 2f;   // 正频率
+                }
+                else
+                {
+                    _minFrequency = 0;
+                    _maxFrequency = value / 2f;  // 奈奎斯特频率
+                }
             }
         }
+
+        /// <summary>
+        /// 是否为IQ模式（像SDRSharp那样处理立体声）
+        /// Whether in IQ mode (process stereo like SDRSharp)
+        /// </summary>
+        public bool IsIQMode { get; set; } = false;
 
         /// <summary>
         /// 最小显示频率（Hz）
